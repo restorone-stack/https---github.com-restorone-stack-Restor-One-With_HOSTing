@@ -224,6 +224,7 @@ let directionsService = null;
 let directionsRenderer = null;
 let routeLine = null; // fallback-прямая линия, если Directions API не ответил
 
+
 const filters = {
     search: '',
     searchType: 'all', // 'all' | 'restaurants' | 'dishes'
@@ -259,38 +260,18 @@ function initMap() {
     directionsRenderer.setMap(map);
 }
 
+
 // ========================
 //  DATA LOAD
 // ========================
 async function loadRestaurants() {
     showLoading(true);
     try {
-        let restaurantsJson;
-        
-        // Try to fetch from PHP backend
-        try {
-            const restaurantsResponse = await fetch('http://localhost/api/restaurants.php');
-            if (restaurantsResponse.ok) {
-                restaurantsJson = await restaurantsResponse.json();
-            } else {
-                throw new Error('API not available');
-            }
-        } catch (apiError) {
-            console.warn('PHP backend not available, using mock data');
-            // Mock data for testing
-            restaurantsJson = [
-                {
-                    id: 1,
-                    name: "Ресторан Пример",
-                    type: "Ресторан",
-                    address: "ул. Абая 10, Алматы",
-                    latitude: 43.238293,
-                    longitude: 76.945465,
-                    rating: 4.5,
-                    cuisine: "Европейская"
-                }
-            ];
-        }
+        // рестораны
+        const restaurantsResponse = await fetch('/api/restaurants.php');
+        if (!restaurantsResponse.ok) throw new Error('Failed to load restaurants data');
+
+        const restaurantsJson = await restaurantsResponse.json();
 
         allRestaurants = restaurantsJson.map(r => ({
             ...r,
@@ -301,28 +282,10 @@ async function loadRestaurants() {
         }));
 
         // блюда
-        let dishesJson;
-        
-        try {
-            const dishesResponse = await fetch('http://localhost/api/dishes.php');
-            if (dishesResponse.ok) {
-                dishesJson = await dishesResponse.json();
-            } else {
-                throw new Error('API not available');
-            }
-        } catch (apiError) {
-            console.warn('Dishes API not available, using mock data');
-            // Mock data for testing
-            dishesJson = [
-                {
-                    id: 1,
-                    name: "Стейк",
-                    price: 5000,
-                    ingredients: "говядина, соль, перец",
-                    restaurants: "1"
-                }
-            ];
-        }
+        const dishesResponse = await fetch('/api/dishes.php');
+        if (!dishesResponse.ok) throw new Error('Failed to load dishes data');
+
+        const dishesJson = await dishesResponse.json();
 
         allDishes = dishesJson.map(d => {
             let id = Number(d.id);
@@ -497,6 +460,7 @@ function displayMarkers() {
 
     document.getElementById('visibleRestaurants').textContent = filteredRestaurants.length;
 }
+
 
 // ========================
 //  SIDEBAR / LIST
@@ -684,7 +648,8 @@ function openRestaurantDetails(id) {
     	const position = { lat: restaurant.latitude, lng: restaurant.longitude };
     	map.setCenter(position);
     	map.setZoom(16);
-    }
+}
+
 }
 
 // ========================
@@ -1209,6 +1174,7 @@ function showRoute(id) {
     );
 }
 
+
 // ========================
 //  UI / MISC
 // ========================
@@ -1246,20 +1212,20 @@ function resetMap() {
     });
 
     if (directionsRenderer) {
-        directionsRenderer.set('directions', null);
-    }
-    if (routeLine) {
-        routeLine.setMap(null);
-        routeLine = null;
-    }
+    directionsRenderer.set('directions', null);
+}
+if (routeLine) {
+    routeLine.setMap(null);
+    routeLine = null;
+}
 
-    if (userLocation) {
-        userLocation = null;
-        if (userMarker) {
-            userMarker.setMap(null);
-            userMarker = null;
-        }
-        document.getElementById('locationBtn').classList.remove('active');
+if (userLocation) {
+    userLocation = null;
+    if (userMarker) {
+        userMarker.setMap(null);
+        userMarker = null;
+    }
+    document.getElementById('locationBtn').classList.remove('active');
     }
 
     filteredRestaurants = [...allRestaurants];
