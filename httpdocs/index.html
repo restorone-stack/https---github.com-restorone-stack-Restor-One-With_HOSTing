@@ -1,0 +1,200 @@
+
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restor-1 PRO - Интерактивная карта ресторанов</title>
+    
+    <link rel="stylesheet" href="styles.css">
+</head>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">Restor-1 PRO 🗺️</div>
+        <div class="header-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="totalRestaurants">0</div>
+                <div class="stat-label" data-i18n="stats.total">Заведений</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="visibleRestaurants">0</div>
+                <div class="stat-label" data-i18n="stats.visible">На карте</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="userDistance">--</div>
+                <div class="stat-label" data-i18n="stats.nearest">Ближайший</div>
+            </div>
+        </div>
+        <!-- Language Switcher -->
+        <div class="language-switcher">
+            <button class="lang-btn active" onclick="changeLanguage('ru')">RU</button>
+            <button class="lang-btn" onclick="changeLanguage('en')">EN</button>
+            <button class="lang-btn" onclick="changeLanguage('kz')">KZ</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-inner">
+            <div class="sidebar-header">
+    <div class="sidebar-title" data-i18n="sidebar.title">🔍 Поиск и фильтры</div>
+
+    <label for="searchInput" class="visually-hidden">
+        Поиск по ресторанам и блюдам
+    </label>
+    <div class="search-container">
+        <input type="text" 
+               class="search-input" 
+               id="searchInput"
+               data-i18n-placeholder="search.placeholder"
+               placeholder="Название, адрес, тип кухни..."
+               oninput="updateSearchButton()">
+        <button class="clear-btn hidden" id="clearBtn" onclick="clearSearch()" title="Очистить">
+            ❌
+        </button>
+        <button class="search-btn" id="searchBtn" onclick="handleSearch()" title="Поиск">
+            🔍
+        </button>
+    </div>
+                <div class="search-type-container">
+                    <div class="search-type-buttons">
+                        <button class="search-type-btn active" data-search-type="all" data-i18n="search.all" onclick="setSearchType('all')">Все</button>
+                        <button class="search-type-btn" data-search-type="restaurants" data-i18n="search.restaurants" onclick="setSearchType('restaurants')">Рестораны</button>
+                        <button class="search-type-btn" data-search-type="dishes" data-i18n="search.dishes" onclick="setSearchType('dishes')">Блюда</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-section">
+                <!-- Type Filter -->
+                <div class="filter-group">
+                    <label class="filter-label" data-i18n="filters.type">🏪 Тип заведения</label>
+                    <div class="filter-buttons" id="typeFilters">
+                        <button class="filter-btn active" data-type="all" data-i18n="filters.all" onclick="filterByType('all')">Все</button>
+                        <button class="filter-btn" data-type="Ресторан" data-i18n="filters.restaurant" onclick="filterByType('Ресторан')">Ресторан</button>
+                        <button class="filter-btn" data-type="Кафе" data-i18n="filters.cafe" onclick="filterByType('Кафе')">Кафе</button>
+                        <button class="filter-btn" data-type="Бар" data-i18n="filters.bar" onclick="filterByType('Бар')">Бар</button>
+                    </div>
+                </div>
+
+                <!-- Rating Filter -->
+                <div class="filter-group">
+    <label class="filter-label" for="ratingSlider">
+        <span data-i18n="filters.rating">⭐ Минимальный рейтинг</span>:
+        <span id="ratingValue">0</span>
+    </label>
+    <div class="slider-container">
+        <input type="range" 
+                			   class="slider" 
+               				   id="ratingSlider"
+                               min="0" 
+                               max="5" 
+                               step="0.5" 
+                               value="0"
+                               oninput="filterByRating(this.value)">
+                    </div>
+                </div>
+
+                <!-- Distance Filter -->
+                <div class="filter-group">
+    <label class="filter-label" for="radiusSlider">
+        <span data-i18n="filters.radius">📍 Радиус поиска</span>:
+        <span id="radiusValue">20</span>
+        <span data-i18n="units.km">км</span>
+    </label>
+    <div class="slider-container">
+        <input type="range" 
+               class="slider" 
+               id="radiusSlider"
+                               min="1" 
+                               max="20" 
+                               step="1" 
+                               value="20"
+                               oninput="filterByRadius(this.value)">
+                    </div>
+                </div>
+
+                <!-- Sort -->
+                <div class="filter-group">
+                    <label class="filter-label" data-i18n="filters.sort">📊 Сортировка</label>
+                    <div class="filter-buttons" id="sortButtons">
+                        <button class="filter-btn active" data-sort="rating" data-i18n="sort.rating" onclick="sortResults('rating')">По рейтингу</button>
+                        <button class="filter-btn" data-sort="distance" data-i18n="sort.distance" onclick="sortResults('distance')">По расстоянию</button>
+                        <button class="filter-btn" data-sort="name" data-i18n="sort.name" onclick="sortResults('name')">По имени</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div class="results-section" id="resultsSection">
+                <div style="text-align: center; padding: 2rem; color: var(--gray);" data-i18n="loading">
+                    Загрузка ресторанов...
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- Toggle Sidebar Button -->
+        <button class="toggle-sidebar-btn" onclick="toggleSidebar()">
+            <span id="toggleIcon">◀</span>
+        </button>
+
+        <!-- Map Container -->
+        <div class="map-container">
+            <div id="map"></div>
+            
+            <!-- Map Controls -->
+            <div class="map-controls">
+                <button class="control-btn" 
+                        id="locationBtn"
+                        onclick="getUserLocation()" 
+                        data-i18n-title="buttons.location"
+                        title="Моё местоположение">
+                    📍
+                </button>
+                <button class="control-btn" 
+                        onclick="findNearest()" 
+                        data-i18n-title="buttons.nearest"
+                        title="Ближайший ресторан">
+                    🎯
+                </button>
+                <button class="control-btn" 
+                        id="clusterBtn"
+                        onclick="toggleClusters()" 
+                        data-i18n-title="buttons.clusters"
+                        title="Кластеры">
+                    🗂️
+                </button>
+                <button class="control-btn" 
+                        onclick="resetMap()" 
+                        data-i18n-title="buttons.reset"
+                        title="Сбросить">
+                    🔄
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <div>Загрузка данных...</div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+	<script async src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places&callback=initMap"></script>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+

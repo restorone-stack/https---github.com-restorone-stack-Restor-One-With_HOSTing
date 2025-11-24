@@ -1,0 +1,8 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = true
+[remote "origin"]
+	url = https://restorone-stack@github.com/restorone-stack/Restor1-Pro
+	fetch = +refs/*:refs/*
+	mirror = true
