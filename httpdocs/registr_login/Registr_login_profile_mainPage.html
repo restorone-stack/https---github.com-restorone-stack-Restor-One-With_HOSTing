@@ -304,6 +304,25 @@
                     <button class="btn btn-primary" onclick="showErbModal()" style="padding: 1rem 2rem; font-size: 1.1rem;">
                         ➕ <span data-lang="add_dishes_from_erb">Добавить блюда из ЕРБ</span>
                     </button>
+					 <button class="btn btn-secondary" onclick="document.getElementById('gptImportCard').scrollIntoView({behavior: 'smooth'});" style="padding: 1rem 1.6rem; font-size: 1.05rem;">
+                        🤖 <span data-lang="add_dishes_from_file">Импорт через GPT</span>
+                    </button>
+                </div>
+                <div id="gptImportCard" class="menu-import-card">
+                    <div class="menu-import-card__header">
+                        <div>
+                            <h3 data-lang="import_menu_title">Импорт меню через GPT</h3>
+                            <p data-lang="import_menu_desc">Загрузите Word/PDF меню прямо здесь. Форма отправит файл в GPT и покажет предпросмотр блюд перед записью.</p>
+                        </div>
+                        <a class="btn btn-tertiary" href="https://restor-one.com/api/menu_import_form.php" target="_blank" rel="noopener">
+                            🔗 <span data-lang="open_full_import_page">Открыть полноэкранно</span>
+                        </a>
+                    </div>
+                    <div class="menu-import-card__body">
+                        <iframe src="https://restor-one.com/api/menu_import_form.php?embedded=1" title="Импорт меню" frameborder="0" loading="lazy"></iframe>
+                    </div>
+                    <p class="menu-import-card__hint" data-lang="import_menu_hint">После отправки формы откроется страница предпросмотра и подтверждения.</p>
+                    <p class="menu-import-card__hint" data-lang="import_menu_launch">Откройте https://<ваш_домен>/registr_login/Registr_login_profile_mainPage.html#dashboard на хостинге, перейдите в «Моё меню» и загрузите файл.</p>
                 </div>
                 <div id="myMenuList"></div>
             </div>
